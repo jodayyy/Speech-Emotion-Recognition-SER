@@ -80,6 +80,7 @@ This project leverages several key libraries and tools:
 - ffmpeg for handling audio file conversions.
 
 ## UI Images
-
+1. Home Page
+![Example Image](images/Home Page.png)
 
 Thank you for using this project!

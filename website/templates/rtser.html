@@ -1,0 +1,143 @@
+{% extends "user-base.html" %}
+
+{% block title %}Real-Time Speech Emotion Recognition Page{% endblock %}
+
+{% block content %}
+<main id="main">
+    <!-- ======= Breadcrumbs Section ======= -->
+    <section class="breadcrumbs">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>Real-Time Speech Emotion Recognition</h2>
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li>Real-Time Speech Emotion Recognition</li>
+                </ol>
+            </div>
+        </div>
+    </section><!-- End Breadcrumbs Section -->
+
+    <!-- ======= Real-Time SER Section ======= -->
+    <section class="real-time-ser" data-aos="fade-up" data-aos-easing="ease-in-out" data-aos-duration="500">
+        <div class="container">
+            <div class="row">
+                <div style="padding:30px;" class="col-lg-8 mx-auto col-gui rounded">
+                    <h1 style="text-align: center;">Real-Time Speech Emotion Recognition</h1>
+                    <br>
+                    <h4>1. Select RTSER prediction interval</h4>
+                    <p>
+                        <label for="intervalSelect">Select Interval (seconds): </label>
+                        <select id="intervalSelect" onchange="updateInterval()" class="form-select">
+                            <option value="1000">1</option>
+                            <option value="2000">2</option>
+                            <option value="3000" selected >3 (Default)</option>
+                            <option value="4000">4</option>
+                            <option value="5000">5</option>
+                        </select>
+                    </p>
+                    <br>
+                    <h4>2. Start RTSER</h4>
+                    <button onclick="startRecording()" class="btn btn-primary">Start Real-Time Recognition</button>
+                    <button onclick="stopRecording()" class="btn btn-secondary" disabled>Stop Recording</button><br>
+                    <div id="emotionBlock" class="mt-3 rounded" style="text-align: center; max-height: 150px; overflow-y: auto; border: 1px solid #000000; padding: 10px;"></div>
+                </div>
+            </div>
+        </div>
+    </section><!-- End Real-Time SER Section -->
+</main><!-- End #main -->
+
+<script>
+    let mediaRecorder;
+    let isRecording = false;
+    let recordingInterval;
+    let intervalDuration = 5000; // default to 5 seconds
+
+    function updateInterval() {
+        intervalDuration = document.getElementById('intervalSelect').value;
+        if (isRecording) {
+            stopRecording();
+            startRecording();
+        }
+    }
+
+    function startRecording() {
+        document.getElementById('emotionBlock').innerHTML = ''; // Reset previous emotions
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+                isRecording = true;
+
+                document.querySelector('button[onclick="startRecording()"]').disabled = true;
+                document.querySelector('button[onclick="stopRecording()"]').disabled = false;
+
+                recordingInterval = setInterval(() => {
+                    if (mediaRecorder.state === 'recording') {
+                        mediaRecorder.stop();
+                        mediaRecorder.start();
+                    }
+                }, intervalDuration);
+
+                mediaRecorder.addEventListener("dataavailable", event => {
+                    if (event.data.size > 0 && isRecording) {
+                        processRealTimeData(event.data);
+                    }
+                });
+
+                mediaRecorder.addEventListener("stop", () => {
+                    if (isRecording) {
+                        mediaRecorder.start();
+                    }
+                });
+            });
+    }
+
+    function stopRecording() {
+        clearInterval(recordingInterval);
+        isRecording = false;
+        mediaRecorder.stop();
+        document.querySelector('button[onclick="startRecording()"]').disabled = false;
+        document.querySelector('button[onclick="stopRecording()"]').disabled = true;
+    }
+
+    function processRealTimeData(blob) {
+        const formData = new FormData();
+        formData.append('real_time_audio', blob);
+
+        fetch('/process_real_time_audio', {
+            method: 'POST',
+            body: formData
+        }).then(response => response.json())
+        .then(data => {
+            let emotionBlock = document.getElementById('emotionBlock');
+            let span = document.createElement('span');
+            span.innerHTML = 'Emotion: ' + data.emotion + ' (Confidence: ' + data.confidence + ')<br>';
+
+            // Remove existing emotion classes
+            emotionBlock.classList.remove('emotion-neutral', 'emotion-happy', 'emotion-sad', 'emotion-angry');
+
+            // Add new emotion class to the block
+            switch (data.emotion.toLowerCase()) {
+                case 'happy':
+                    emotionBlock.classList.add('emotion-happy');
+                    break;
+                case 'sad':
+                    emotionBlock.classList.add('emotion-sad');
+                    break;
+                case 'angry':
+                    emotionBlock.classList.add('emotion-angry');
+                    break;
+                default:
+                    emotionBlock.classList.add('emotion-neutral');
+            }
+
+            emotionBlock.appendChild(span);
+            scrollToBottom(emotionBlock);
+        });
+    }
+
+    function scrollToBottom(element) {
+        element.scrollTop = element.scrollHeight;
+    }
+</script>
+{% endblock %}

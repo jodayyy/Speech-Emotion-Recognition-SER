@@ -1,0 +1,58 @@
+{% extends "index-base.html" %}
+
+{% block title %}SER Index Page{% endblock %} 
+{% block content %}
+  <!-- ======= Hero Section ======= -->
+  <section id="hero" class="d-flex justify-cntent-center align-items-center">
+    <div id="heroCarousel" class="container carousel carousel-fade" data-bs-ride="carousel" data-bs-interval="1000000000">
+
+      <!-- Slide 1 -->
+      <div class="carousel-item active">
+        <div class="carousel-container">
+          <h2 class="animate__animated animate__fadeInDown">Welcome to <span>Speech Emotion Recognition</span></h2>
+          <p class="animate__animated animate__fadeInUp">Speech Emotion Recognition is system where user can use A.I to predict emotions from speech.</p>
+          <div class="col-md-6 col-lg-3 d-flex align-items-stretch" data-aos="fade-up">
+            <a href="/upload" class="btn-get-started animate__animated animate__fadeInUp nav-item nav-link">Upload Audio</a>
+            <a href="/record" class="btn-get-started animate__animated animate__fadeInUp nav-item nav-link">Record Audio</a>
+          </div>
+          <a href="/real_time_ser" class="btn-get-started animate__animated animate__fadeInUp nav-item nav-link">Real-Time Speech Emotion Recognition</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End Hero -->
+
+  <main id="main">
+    <!-- ======= Services Section ======= -->
+    <section class="services">
+      <div class="container">
+        <div class="section-title">
+          <h2>Features</h2>
+          <p>Speech Emotion Recognition System features include upload speech audio files, record speech audio and real-time speech emotion recognition. Features will be updated and new features will be added in the future.</p>
+        </div>
+        <div class="row">
+
+          <div class="col-md-6 col-lg-3 d-flex align-items-stretch" data-aos="fade-up">
+          </div>
+
+          <div class="col-md-6 col-lg-3 d-flex align-items-stretch" data-aos="fade-up">
+            <div class="icon-box icon-box-pink">
+              <div class="icon"><i class=" bx bx-folder"></i><i class="bx bx-microphone"></i></div>
+              <h4 class="title">Upload and Record Speech Audio</h4>
+              <p class="description">Upload speech audio file (.wav) or record speech audio using microphone. After uploading or recording the speech audio, user can preview the audio and predict the speech emotion using the A.I model.</p>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-3 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
+            <div class="icon-box icon-box-green">
+              <div class="icon"><i class=" bx bx-headphone"></i></div>
+              <h4 class="title">Real-Time Speech Emotion Recognition</h4>
+              <p class="description">Predict speech emotion in real time. User can choose the interval of speech emotion prediction (1-5 seconds) before using the real-time SER. The system can only use device's microphone for now. Prediction using system's audio will be added in the future.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section><!-- End Services Section -->
+  </main><!-- End #main -->
+{% endblock %}

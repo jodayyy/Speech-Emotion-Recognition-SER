@@ -1,0 +1,103 @@
+{% extends "user-base.html" %}
+
+{% block title %}Upload Speech Audio Page{% endblock %}
+
+{% block content %}
+<main id="main">
+    <!-- ======= Breadcrumbs Section ======= -->
+    <section class="breadcrumbs">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2>Upload Speech Audio</h2>
+                <ol>
+                    <li><a href="/">Home</a></li>
+                    <li>Upload Speech Audio</li>
+                </ol>
+            </div>
+        </div>
+    </section><!-- End Breadcrumbs Section -->
+
+    <!-- ======= Upload Section ======= -->
+    <section class="upload" data-aos="fade-up" data-aos-easing="ease-in-out" data-aos-duration="500">
+        <div class="container">
+            <div class="row">
+                <div style="padding:30px;" class="col-lg-8 mx-auto col-gui rounded">
+                    <h1 style="text-align: center;">Upload Speech Audio</h1>
+                    <br>
+                    <h4>1. Choose and upload your speech audio file (.wav)</h4>
+                    <form id="uploadForm" method="post" enctype="multipart/form-data">
+                        <div class="form-group d-flex align-items-stretch">
+                            <input type="file" name="file" id="fileInput" class="form-control">
+                            <button type="button" class="btn btn-danger" onclick="uploadFile()">Upload</button>
+                        </div>
+                        <br>
+                        <h4>2. Audio preview</h4>
+                        <audio id="audioPlayer" controls hidden class="mt-3"></audio>
+                        <br>
+                        <br>
+                        <h4>3. Predict speech audio emotion</h4>
+                        <button type="button" class="btn btn-danger mt-2" onclick="predictEmotion()" id="predictEmotionButton">Predict Emotion</button>
+                        <br>
+                    </form>
+                    <div id="emotionBlock" class="mt-3 rounded" style="text-align: center; max-height: 200px; overflow-y: auto; border: 1px solid #000000; padding: 10px;">
+                        <h4 id="statusMessage" class="mt-1"></h4>
+                        <h4 id="resultMessage" class="mt-1"></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section><!-- End Upload Section -->
+</main><!-- End #main -->
+
+<script>
+  function uploadFile() {
+      var formData = new FormData(document.getElementById('uploadForm'));
+      fetch('/upload', {
+          method: 'POST',
+          body: formData
+      }).then(response => response.text())
+        .then(data => {
+            alert('File uploaded!'); // Popup alert
+            document.getElementById('audioPlayer').src = URL.createObjectURL(document.getElementById('fileInput').files[0]);
+            document.getElementById('audioPlayer').hidden = false;
+            document.getElementById('predictEmotion').hidden = false;
+        });
+  }
+
+  function predictEmotion() {
+    document.getElementById('predictEmotionButton').disabled = true; // Disable button while processing
+    fetch('/predict_emotion', {
+        method: 'GET'
+    }).then(response => response.json())
+      .then(data => {
+          const emotion = data.emotion.toLowerCase();
+          const resultBlock = document.getElementById('emotionBlock');
+          const resultMessage = document.getElementById('resultMessage');
+          resultMessage.innerText = 'Emotion: ' + data.emotion + ' (Confidence: ' + data.confidence + ')';
+
+          // Remove existing emotion classes
+          resultBlock.classList.remove('emotion-neutral', 'emotion-happy', 'emotion-sad', 'emotion-angry');
+
+          // Add new emotion class to the block
+          switch (emotion) {
+              case 'happy':
+                  resultBlock.classList.add('emotion-happy');
+                  break;
+              case 'sad':
+                  resultBlock.classList.add('emotion-sad');
+                  break;
+              case 'angry':
+                  resultBlock.classList.add('emotion-angry');
+                  break;
+              default:
+                  resultBlock.classList.add('emotion-neutral');
+          }
+          
+          document.getElementById('predictEmotionButton').disabled = false; // Re-enable button
+      }).catch(error => {
+          console.error('Error:', error);
+          document.getElementById('predictEmotionButton').disabled = false; // Re-enable button in case of error
+      });
+    }
+</script>
+{% endblock %}

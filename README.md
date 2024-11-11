@@ -81,6 +81,15 @@ This project leverages several key libraries and tools:
 
 ## UI Images
 1. Home Page
-![Example Image](images/Home Page.png)
+![Home Page](images/HomePage.png)
+
+2. Record Page
+![Record Page](images/Record.png)
+
+3. RTSER Page
+![RTSER Page](images/RTSER.png)
+
+4. Upload Page
+![Upload Page](images/Upload.png)
 
 Thank you for using this project!
